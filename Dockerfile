@@ -1,6 +1,9 @@
 
-FROM openjdk:8-jre-alpine
+FROM openjdk:8-jdk-alpine
 VOLUME /tmp
+#RUN apk add --update openssl && \
+#    rm -rf /var/cache/apk/*
+RUN apk add --update ttf-dejavu && rm -rf /var/cache/apk/*
 ARG JAVA_OPTS
 ENV JAVA_OPTS=$JAVA_OPTS
 ENV PATH_TO_SIGNATURE=/opt/conf/signature.pfx

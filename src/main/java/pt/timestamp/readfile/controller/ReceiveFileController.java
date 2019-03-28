@@ -43,7 +43,7 @@ public class ReceiveFileController {
             PDFSecure pdfDoc = new PDFSecure(new ByteArrayInputStream(decodedContent), null);
 
             // Load the keystore that contains the digital id to use in signing
-            FileInputStream pkcs12Stream = new FileInputStream ("C:\\Users\\marco.emidio\\Desktop\\signature.pfx");
+            FileInputStream pkcs12Stream = new FileInputStream ("/opt/conf/signature.pfx");
             KeyStore store = KeyStore.getInstance("PKCS12");
             store.load(pkcs12Stream, "mypassword".toCharArray());
             pkcs12Stream.close();
@@ -58,7 +58,7 @@ public class ReceiveFileController {
             pdfDoc.signDocument(signField, signInfo);
 
             // Save the document
-            pdfDoc.saveDocument ("C:\\Users\\marco.emidio\\Desktop\\output.pdf");
+            //pdfDoc.saveDocument ("C:\\Users\\marco.emidio\\Desktop\\output.pdf");
             
             ByteArrayOutputStream signedContent = new  ByteArrayOutputStream();
 
