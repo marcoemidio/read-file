@@ -6,9 +6,9 @@ VOLUME /tmp
 RUN apk add --update ttf-dejavu && rm -rf /var/cache/apk/*
 ARG JAVA_OPTS
 ENV JAVA_OPTS=$JAVA_OPTS
-ENV PATH_TO_SIGNATURE=/opt/conf/signature.pfx
+ENV KEYSTORE_PATH=/opt/conf/edpccikeyvault-signature-pkcs12-20190412.pfx
 ADD target/read-file-0.0.1-SNAPSHOT.jar read-file.jar
-COPY src/main/resources/signature.pfx /opt/conf/
+COPY src/main/resources/edpccikeyvault-signature-pkcs12-20190412.pfx /opt/conf/
 #COPY libs/jPDFProcess.v2018R1.10.jar /opt/libs/
 EXPOSE 8080
 ENTRYPOINT exec java $JAVA_OPTS -jar read-file.jar

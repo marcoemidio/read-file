@@ -18,7 +18,7 @@ import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.util.Base64;
 
-import com.qoppa.pdf.PDFException;
+import com.qoppa.pdf.SignatureAppearance;
 import com.qoppa.pdf.SigningInformation;
 import com.qoppa.pdf.form.SignatureField;
 import com.qoppa.pdfSecure.PDFSecure;
@@ -27,7 +27,7 @@ import com.qoppa.pdfSecure.PDFSecure;
 @Slf4j
 public class ReceiveFileController {
 
-/**
+    /**
      * Receive a Json request
      *
      * @param JsonRequest
@@ -37,28 +37,29 @@ public class ReceiveFileController {
     public ResponseEntity<JsonResponse> receiveFile(@RequestBody JsonRequest request) {
         
         try{
-
             byte[] decodedContent = Base64.getDecoder().decode(request.getContent());
 
             PDFSecure pdfDoc = new PDFSecure(new ByteArrayInputStream(decodedContent), null);
 
             // Load the keystore that contains the digital id to use in signing
-            FileInputStream pkcs12Stream = new FileInputStream ("/opt/conf/signature.pfx");
+            FileInputStream pkcs12Stream = new FileInputStream (System.getenv("KEYSTORE_PATH"));
             KeyStore store = KeyStore.getInstance("PKCS12");
+            
             store.load(pkcs12Stream, "mypassword".toCharArray());
             pkcs12Stream.close();
 
             // Create signing information
             SigningInformation signInfo = new SigningInformation (store, "myalias", "mypassword");
+
+            // Customize the signature appearance
+            SignatureAppearance signAppear = signInfo.getSignatureAppearance();
+
             // Create signature field on the first page
             Rectangle2D signBounds = new Rectangle2D.Double (36, 36, 144, 48);
             SignatureField signField = pdfDoc.addSignatureField(0, "signature", signBounds);
 
             // Apply digital signature
             pdfDoc.signDocument(signField, signInfo);
-
-            // Save the document
-            //pdfDoc.saveDocument ("C:\\Users\\marco.emidio\\Desktop\\output.pdf");
             
             ByteArrayOutputStream signedContent = new  ByteArrayOutputStream();
 
@@ -70,6 +71,7 @@ public class ReceiveFileController {
 
             return new ResponseEntity<>(new JsonResponse(request.getFileName(), encodedSignedContent, "sucess"), HttpStatus.CREATED);
         } catch (Exception e) {
+            
             e.printStackTrace();
             return new ResponseEntity<>(new JsonResponse(request.getFileName(), "null", "exception"), HttpStatus.INTERNAL_SERVER_ERROR);
         }
